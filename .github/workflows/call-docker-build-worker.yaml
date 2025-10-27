@@ -27,7 +27,7 @@ jobs:
         uses: sysdiglabs/scan-action@v6
         with:
             image-tag: sysdigassessment/${WORKER_IMAGE_NAME}:latest
-            sysdig-secure-token: ${{ secrets.SYSDIG_SECURE_TOKEN }}
+            sysdig-secure-token: ${{ secrets.SYSDIG_API_TOKEN }}
 
       - name: Upload SARIF file
         if: success() || failure()
