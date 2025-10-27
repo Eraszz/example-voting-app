@@ -20,13 +20,13 @@ jobs:
 
       - name: Build worker container (no push)
         run: |
-          docker build -t sysdigassessment/${{ env.WORKER_IMAGE_NAME }}:latest ./worker
+          docker build -t sysdigassessment/${{ vars.WORKER_IMAGE_NAME }}:latest ./worker
 
       - name: Scan image
         id: scan
         uses: sysdiglabs/scan-action@v6
         with:
-            image-tag: sysdigassessment/${{ env.WORKER_IMAGE_NAME }}:latest
+            image-tag: sysdigassessment/${{ vars.WORKER_IMAGE_NAME }}:latest
             sysdig-secure-token: ${{ secrets.SYSDIG_API_TOKEN }}
 
       - name: Upload SARIF file
