@@ -15,8 +15,14 @@ spec:
         app: vote
     spec:
       containers:
-      - image: dockersamples/examplevotingapp_vote
+      - image: 891377337561.dkr.ecr.eu-central-1.amazonaws.com/sysdig-assessment:vote-statsd
+        imagePullPolicy: Always
         name: vote
+        env:
+        - name: STATSD_HOST
+          value: "127.0.0.1"
+        - name: STATSD_PORT
+          value: "8125"
         ports:
         - containerPort: 80
           name: vote

@@ -5,12 +5,18 @@ import socket
 import random
 import json
 import logging
+from statsd import StatsClient
 
 option_a = os.getenv('OPTION_A', "Cats")
 option_b = os.getenv('OPTION_B', "Dogs")
 hostname = socket.gethostname()
 
 app = Flask(__name__)
+
+# statsd clients
+statsd = StatsClient(host=os.getenv('STATSD_HOST', '127.0.0.1'),
+                     port=int(os.getenv('STATSD_PORT', 8125)),
+                     prefix='voting_app')
 
 gunicorn_error_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers.extend(gunicorn_error_logger.handlers)
@@ -23,6 +29,9 @@ def get_redis():
 
 @app.route("/", methods=['POST','GET'])
 def hello():
+    # count page views
+    statsd.incr('page_views')
+
     voter_id = request.cookies.get('voter_id')
     if not voter_id:
         voter_id = hex(random.getrandbits(64))[2:-1]
@@ -32,6 +41,10 @@ def hello():
     if request.method == 'POST':
         redis = get_redis()
         vote = request.form['vote']
+
+        # record vote metrics
+        statsd.incr(f'vote.{vote}')
+
         app.logger.info('Received vote for %s', vote)
         data = json.dumps({'voter_id': voter_id, 'vote': vote})
         redis.rpush('votes', data)
